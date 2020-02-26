@@ -15,7 +15,7 @@ def drawLines(img, points, r, g, b):
 def drawCross(img, center, r, g, b):
     d = 5
     t = 2
-    LINE_AA = cv2.LINE_AA if cv2.__version__[0] == '3' else cv2.CV_AA
+    LINE_AA = cv2.LINE_AA if cv2.__version__[0] == '3' else cv2.LINE_AA
     color = (r, g, b)
     ctrx = center[0,0]
     ctry = center[0,1]
