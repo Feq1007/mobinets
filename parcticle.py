@@ -10,7 +10,7 @@ import cv2
 def drawLines(img, points, r, g, b):
     cv2.polylines(img, [np.int32(points)], isClosed=False, color=(r, g, b))
 
-# ÒÔcenterÎªÖĞĞÄ»­Ê®×Ö
+# ä»¥centerä¸ºä¸­å¿ƒç”»åå­—
 def drawCross(img, center, r, g, b):
     d = 5
     t = 2
@@ -21,74 +21,74 @@ def drawCross(img, center, r, g, b):
     cv2.line(img, (ctrx - d, ctry - d), (ctrx + d, ctry + d), color, t, LINE_AA)
     cv2.line(img, (ctrx + d, ctry - d), (ctrx - d, ctry + d), color, t, LINE_AA)
     
-#Êó±êÊÂ¼ş»Øµ÷º¯Êı£¬event±íÊ¾Êó±êÊÂ¼ş£¬£¨x,y)±íÊ¾Êó±ê×ø±ê£¬flagsÊÇCV_EVENT_FLAGµÄ×éºÏ£¬nullËµÃ÷Ã»ÓĞÀ´×ÔÍâ½çµÄ²ÎÊı
+#é¼ æ ‡äº‹ä»¶å›è°ƒå‡½æ•°ï¼Œeventè¡¨ç¤ºé¼ æ ‡äº‹ä»¶ï¼Œï¼ˆx,y)è¡¨ç¤ºé¼ æ ‡åæ ‡ï¼Œflagsæ˜¯CV_EVENT_FLAGçš„ç»„åˆï¼Œnullè¯´æ˜æ²¡æœ‰æ¥è‡ªå¤–ç•Œçš„å‚æ•°
 def mouseCallback(event, x, y, flags,null):
     global center
-    global trajectory#¹ìµÀ
+    global trajectory#è½¨é“
     global previous_x
     global previous_y
     global zs
     global robot_pos
     
     center=np.array([[x,y]])
-    trajectory=np.vstack((trajectory,np.array([x,y])))#Ïß¶ÎµÄÆğµãÎªµ±Ç°×ø±ê
+    trajectory=np.vstack((trajectory,np.array([x,y])))#çº¿æ®µçš„èµ·ç‚¹ä¸ºå½“å‰åæ ‡
     #noise=sensorSigma * np.random.randn(1,2) + sensorMu
     
-    if previous_x >0:#Êó±êÖ®Ç°µÄx×ø±ê
-        #ÇóÒÆ¶¯·½Ïò£¬»¡¶ÈÖÆ£¨yÏòÉÏÎªÕı£¬ÏòÏÂÎª¸º£¬xÏòÉÏÎªÈñ½Ç£¬ÏòÏÂÎª¶Û½Ç£©
+    if previous_x >0:#é¼ æ ‡ä¹‹å‰çš„xåæ ‡
+        #æ±‚ç§»åŠ¨æ–¹å‘ï¼Œå¼§åº¦åˆ¶ï¼ˆyå‘ä¸Šä¸ºæ­£ï¼Œå‘ä¸‹ä¸ºè´Ÿï¼Œxå‘ä¸Šä¸ºé”è§’ï¼Œå‘ä¸‹ä¸ºé’è§’ï¼‰
         heading=np.arctan2(np.array([y-previous_y]), np.array([previous_x-x ]))
         if heading>0:
             heading=-(heading-np.pi)
         else:
             heading=-(np.pi+heading)
             
-        #Çó¾àÀë£ºaxis=1±íÊ¾°´ĞĞÏòÁ¿´¦Àí£¬Çó¶à¸öĞĞÏòÁ¿µÄ·¶Êı(Æ½·½ºÍ¿ª¸ù£¬Å·Ê½¾àÀë)
+        #æ±‚è·ç¦»ï¼šaxis=1è¡¨ç¤ºæŒ‰è¡Œå‘é‡å¤„ç†ï¼Œæ±‚å¤šä¸ªè¡Œå‘é‡çš„èŒƒæ•°(å¹³æ–¹å’Œå¼€æ ¹ï¼Œæ¬§å¼è·ç¦»)
         distance=np.linalg.norm(np.array([[previous_x,previous_y]])-np.array([[x,y]]) ,axis=1)
         
-        std=np.array([2,4])#£¿£¿£¿£¿£¿£¿£¿£¿£¿£¿£¿
-        u=np.array([heading,distance])#·½ÏòºÍ¾àÀë
+        std=np.array([2,4])#ï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿ
+        u=np.array([heading,distance])#æ–¹å‘å’Œè·ç¦»
         
-        #Í¨¹ıµ±Ç°Á£×Ó¼°ÔË¶¯·½ÏòºÍ¾àÀëÔ¤²âÁ£×ÓĞÂ×ø±ê
+        #é€šè¿‡å½“å‰ç²’å­åŠè¿åŠ¨æ–¹å‘å’Œè·ç¦»é¢„æµ‹ç²’å­æ–°åæ ‡
         predict(particles, u, std, dt=1.)
         
-        #µØ±êÓëÊó±êÖĞĞÄµÄ¾àÀë£¬´øÎó²î
+        #åœ°æ ‡ä¸é¼ æ ‡ä¸­å¿ƒçš„è·ç¦»ï¼Œå¸¦è¯¯å·®
         zs = (np.linalg.norm(landmarks - center, axis=1) + (np.random.randn(NL) * sensor_std_err))
         
-        update(particles, weights, z=zs, R=50, landmarks=landmarks)#Í¨¹ıÈ¨ÖØĞŞ¸ÄÁ£×Ó¸ÅÂÊ
-        indexes = systematic_resample(weights)#ÖØ²ÉÑùË÷Òı
-        resample_from_index(particles, weights, indexes)#¸ù¾İ²ÉÑùË÷ÒıÖØ²ÉÑù
+        update(particles, weights, z=zs, R=50, landmarks=landmarks)#é€šè¿‡æƒé‡ä¿®æ”¹ç²’å­æ¦‚ç‡
+        indexes = systematic_resample(weights)#é‡é‡‡æ ·ç´¢å¼•
+        resample_from_index(particles, weights, indexes)#æ ¹æ®é‡‡æ ·ç´¢å¼•é‡é‡‡æ ·
         
-        #Í¨¹ı´øÈ«Æ½¾ùÖµ¼ÆËã»úÆ÷ÈËÎ»ÖÃ
+        #é€šè¿‡å¸¦å…¨å¹³å‡å€¼è®¡ç®—æœºå™¨äººä½ç½®
         robot_pos = np.average(particles[:], weights=weights, axis=0)
         print(robot_pos)
         
         
-    #¸üĞÂ×ø±ê
+    #æ›´æ–°åæ ‡
     previous_x=x
     previous_y=y
 
 #sensorMu=0
 #sensorSigma=3
 
-#´«¸ĞÆ÷±ê×¼²î
+#ä¼ æ„Ÿå™¨æ ‡å‡†å·®
 sensor_std_err=5
 
 
-#²½ÖèÒ»£º´´½¨Ëæ»ú³õÊ¼»¯Á£×Ó£¬N±íÊ¾¸öÊı
+#æ­¥éª¤ä¸€ï¼šåˆ›å»ºéšæœºåˆå§‹åŒ–ç²’å­ï¼ŒNè¡¨ç¤ºä¸ªæ•°
 def create_uniform_particles(x_range, y_range, N):
-    particles = np.empty((N, 2))# ĞÎ×´Îª Nx2 µÄ¾ØÕó
-    particles[:, 0] = uniform(x_range[0], x_range[1], size=N)#Ëæ»ú³õÊ¼»¯£¬ÔÚx[0]~x[1]Ö®¼ä£¬ºá×ø±ê
-    particles[:, 1] = uniform(y_range[0], y_range[1], size=N)#Ëæ»ú³õÊ¼»¯£¬ÔÚy[0]~y[1]Ö®¼ä£¬×İ×ø±ê
+    particles = np.empty((N, 2))# å½¢çŠ¶ä¸º Nx2 çš„çŸ©é˜µ
+    particles[:, 0] = uniform(x_range[0], x_range[1], size=N)#éšæœºåˆå§‹åŒ–ï¼Œåœ¨x[0]~x[1]ä¹‹é—´ï¼Œæ¨ªåæ ‡
+    particles[:, 1] = uniform(y_range[0], y_range[1], size=N)#éšæœºåˆå§‹åŒ–ï¼Œåœ¨y[0]~y[1]ä¹‹é—´ï¼Œçºµåæ ‡
     return particles
 
-#²½Öè¶ş£ºÔ¤²â
+#æ­¥éª¤äºŒï¼šé¢„æµ‹
 def predict(particles, u, std, dt=1.):
     """
-    *** ¹¦ÄÜ£º½ö¸Ä±äÁ£×Ó×ø±ê
-    *** particles£ºÁ£×Ó¾ØÕó    
+    *** åŠŸèƒ½ï¼šä»…æ”¹å˜ç²’å­åæ ‡
+    *** particlesï¼šç²’å­çŸ©é˜µ    
     *** u[0]=heading,u[1]=distance
     *** std:[2,4]
-    *** dt:¾àÀëÎó²î£¿
+    *** dt:è·ç¦»è¯¯å·®ï¼Ÿ
     """
     N = len(particles)
     # np.random.randn(N)
@@ -96,51 +96,51 @@ def predict(particles, u, std, dt=1.):
     particles[:, 0] += np.cos(u[0]) * dist
     particles[:, 1] += np.sin(u[0]) * dist
    
-#²½ÖèÈı£º¸üĞÂ
+#æ­¥éª¤ä¸‰ï¼šæ›´æ–°
 def update(particles, weights, z, R, landmarks):
     """
-    *** particles:Á£×Ó¾ØÕó
-    *** weigths:Á£×ÓÈ¨ÖØ
-    *** z:µØ±êµ½Êó±êÖĞĞÄµÄ¾àÀë£¬´øÎó²î
+    *** particles:ç²’å­çŸ©é˜µ
+    *** weigths:ç²’å­æƒé‡
+    *** z:åœ°æ ‡åˆ°é¼ æ ‡ä¸­å¿ƒçš„è·ç¦»ï¼Œå¸¦è¯¯å·®
     *** R:50
-    *** landmarks:µØ±ê
+    *** landmarks:åœ°æ ‡
     """
     b, loc, scale = 1.5, 0, 1
     weights.fill(1.)
     for i, landmark in enumerate(landmarks):
-        distance=np.power((particles[:,0] - landmark[0])**2 +(particles[:,1] - landmark[1])**2,0.5)#Ã¿¸öÁ£×Óµ½µØ±êµÄ¾àÀë : N*1
-        weights *= scipy.stats.norm(distance, R).pdf(z[i])#¾ùÖµÊÇdistance£¬·½²îÊÇR=50µÄÕıÌ¬·Ö²¼,.pdf(z[i])±íÊ¾¸Ã·Ö²¼ÏÂÈ¡z[i]µÄ¸ÅÂÊ
+        distance=np.power((particles[:,0] - landmark[0])**2 +(particles[:,1] - landmark[1])**2,0.5)#æ¯ä¸ªç²’å­åˆ°åœ°æ ‡çš„è·ç¦» : N*1
+        weights *= scipy.stats.norm(distance, R).pdf(z[i])#å‡å€¼æ˜¯distanceï¼Œæ–¹å·®æ˜¯R=50çš„æ­£æ€åˆ†å¸ƒ,.pdf(z[i])è¡¨ç¤ºè¯¥åˆ†å¸ƒä¸‹å–z[i]çš„æ¦‚ç‡
     weights += 1.e-300 # avoid round-off to zero
-    weights /= sum(weights)#¹éÒ»»¯
+    weights /= sum(weights)#å½’ä¸€åŒ–
 
-#È¨ÖØÆ½·½µÄºÍ£ºÓÃÓÚ¹éÒ»»¯
+#æƒé‡å¹³æ–¹çš„å’Œï¼šç”¨äºå½’ä¸€åŒ–
 def neff(weights):
     return 1. / np.sum(np.square(weights))
 
-#ÖØ²ÉÑù
+#é‡é‡‡æ ·
 def systematic_resample(weights):
     N = len(weights)
-    positions = (np.arange(N) + np.random.random()) / N #ÖØ²ÉÑùÎ»ÖÃ:Öğ½¥Ôö¼Ó
+    positions = (np.arange(N) + np.random.random()) / N #é‡é‡‡æ ·ä½ç½®:é€æ¸å¢åŠ 
 
-    indexes = np.zeros(N, 'i')#intĞÍÊı×é
-    cumulative_sum = np.cumsum(weights)#µÚnÏîÊÇÇ°nÏîºÍ
+    indexes = np.zeros(N, 'i')#intå‹æ•°ç»„
+    cumulative_sum = np.cumsum(weights)#ç¬¬né¡¹æ˜¯å‰né¡¹å’Œ
     i, j = 0, 0
     while i < N and j < N:
-        if positions[i] < cumulative_sum[j]:#Èç¹ûÎ»ÖÃiĞ¡ÓÚÈ¨ÖØÇ°jÏîºÍ
+        if positions[i] < cumulative_sum[j]:#å¦‚æœä½ç½®iå°äºæƒé‡å‰jé¡¹å’Œ
             indexes[i] = j
             i += 1
         else:
             j += 1
     return indexes
     
-#ÆÀ¹À
+#è¯„ä¼°
 def estimate(particles, weights):
     pos = particles[:, 0:1]
-    mean = np.average(pos, weights=weights, axis=0)#¾ùÖµ
-    var = np.average((pos - mean)**2, weights=weights, axis=0)#·½²î
+    mean = np.average(pos, weights=weights, axis=0)#å‡å€¼
+    var = np.average((pos - mean)**2, weights=weights, axis=0)#æ–¹å·®
     return mean, var
 
-#Í¨¹ıË÷ÒıÀ´ÖØ²ÉÑù£¬È¨Öµ¹éÒ»»¯
+#é€šè¿‡ç´¢å¼•æ¥é‡é‡‡æ ·ï¼Œæƒå€¼å½’ä¸€åŒ–
 def resample_from_index(particles, weights, indexes):
     particles[:] = particles[indexes]
     weights[:] = weights[indexes]
@@ -153,34 +153,34 @@ y_range=np.array([0,600])
 #Number of partciles
 N=400
 
-#µØ±êµÄ×ø±ê
+#åœ°æ ‡çš„åæ ‡
 landmarks=np.array([ [144,73], [410,13], [336,175], [718,159], [178,484], [665,464]  ])
-#µØ±êµÄ¸öÊı
+#åœ°æ ‡çš„ä¸ªæ•°
 NL = len(landmarks)
-#Ëæ»ú³õÊ¼»¯NÁ£×Ó×ø±ê¾ØÕó£ºÆäxÎªËæ»úºá×ø±ê£¬yÎªËæ»ú×İ×ø±ê
+#éšæœºåˆå§‹åŒ–Nç²’å­åæ ‡çŸ©é˜µï¼šå…¶xä¸ºéšæœºæ¨ªåæ ‡ï¼Œyä¸ºéšæœºçºµåæ ‡
 particles=create_uniform_particles(x_range, y_range, N)
 
-#Á£×ÓÈ¨Öµ³õÊ¼»¯Îª1
+#ç²’å­æƒå€¼åˆå§‹åŒ–ä¸º1
 weights = np.array([1.0]*N)
 
-#ÏÔÊ¾´°¿Ú´óĞ¡
+#æ˜¾ç¤ºçª—å£å¤§å°
 WIDTH=800
 HEIGHT=600
 WINDOW_NAME="Particle Filter"
 
 # Create a black image, a window and bind the function to window
-img = np.zeros((HEIGHT,WIDTH,3), np.uint8)#¸÷¸ö×ø±êµã¼°ÆäÏñËØÖµ£¨RGB£©
+img = np.zeros((HEIGHT,WIDTH,3), np.uint8)#å„ä¸ªåæ ‡ç‚¹åŠå…¶åƒç´ å€¼ï¼ˆRGBï¼‰
 cv2.namedWindow(WINDOW_NAME)
-cv2.setMouseCallback(WINDOW_NAME,mouseCallback)#¹ØÁªÊó±êÊÂ¼şÓëÖµ
+cv2.setMouseCallback(WINDOW_NAME,mouseCallback)#å…³è”é¼ æ ‡äº‹ä»¶ä¸å€¼
 
-# Êó±êÖĞĞÄ
+# é¼ æ ‡ä¸­å¿ƒ
 center=np.array([[-10,-10]])
 
-trajectory=np.zeros(shape=(0,2))#¹ìµÀ
-robot_pos=np.zeros(shape=(1,2))#»úÆ÷ÈËÎ»ÖÃ
-previous_x=-1#ÉÏÒ»¸ö×ø±êx
-previous_y=-1#ÉÏÒ»¸ö×ø±êy
-DELAY_MSEC=50#ÑÓ³ÙºÁÃëÊı
+trajectory=np.zeros(shape=(0,2))#è½¨é“
+robot_pos=np.zeros(shape=(1,2))#æœºå™¨äººä½ç½®
+previous_x=-1#ä¸Šä¸€ä¸ªåæ ‡x
+previous_y=-1#ä¸Šä¸€ä¸ªåæ ‡y
+DELAY_MSEC=50#å»¶è¿Ÿæ¯«ç§’æ•°
 
 while(1):
     cv2.imshow(WINDOW_NAME,img)
@@ -192,15 +192,15 @@ while(1):
     for landmark in landmarks:
         cv2.circle(img,tuple(landmark),10,(255,0,0),-1)
     
-    #draw_particles:»­Á£×Ó
+    #draw_particles:ç”»ç²’å­
     for particle in particles:
         cv2.circle(img,tuple((int(particle[0]),int(particle[1]))),1,(255,255,255),-1)
         
-    #Ë¢ĞÂÍ¼Ïñ£¬°´ÏÂescÍË³ö
+    #åˆ·æ–°å›¾åƒï¼ŒæŒ‰ä¸‹escé€€å‡º
     if cv2.waitKey(DELAY_MSEC) & 0xFF == 27:
         break
     
-    #ÏÔÊ¾ÌáÊ¾ĞÅÏ¢
+    #æ˜¾ç¤ºæç¤ºä¿¡æ¯
     cv2.circle(img,(10,10),10,(255,0,0),-1)
     cv2.circle(img,(10,30),3,(255,255,255),-1)
     drawLines(img, np.array([[10,55],[25,55]]), 0, 255, 0)
