@@ -108,7 +108,7 @@ def update(particles, weights, z, R, landmarks):
     b, loc, scale = 1.5, 0, 1
     weights.fill(1.)
     for i, landmark in enumerate(landmarks):
-        distance=np.power((particles[:,0] - landmark[0])**2 +(particles[:,1] - landmark[1])**2,0.5)#每个粒子到地标的距离 : N*1
+        distance=np.power((particles[:,0] - landmark[0])**2 +(particles[:,1] - landmark[1])**2+(np.random.randn(1) * sensor_std_err),0.5)#每个粒子到地标的距离 : N*1
         weights *= scipy.stats.norm(distance, R).pdf(z[i])#均值是distance，方差是R=50的正态分布,.pdf(z[i])表示该分布下取z[i]的概率
     weights += 1.e-300 # avoid round-off to zero
     weights /= sum(weights)#归一化
@@ -210,4 +210,4 @@ while(1):
     cv2.putText(img,"robot position : ",(30,80),1,1.0,(0,255,0))
 #    cv2.putText(img,str(robot_pos[0],(30,100),1,1.0,(255,255,0))
     
-cv2.destroyAllWindows()
+cv2.destroyAllWindows() 
